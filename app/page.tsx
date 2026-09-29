@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const SERVICES = ["Personal care", "Homemaking", "Respite care"];
+const SERVICES = ["Personal Care", "Homemaking", "Respite"];
 
 const labelClass = "w-48 pr-4 text-right text-[13px] font-bold text-[#3a8fc7]";
 const inputClass =
