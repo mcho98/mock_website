@@ -8,6 +8,8 @@ const labelClass = "w-48 pr-4 text-right text-[13px] font-bold text-[#3a8fc7]";
 const inputClass =
   "border border-[#7f9db9] bg-[#dfe9f1] px-1 py-0.5 text-right text-sm text-black";
 
+const TWO_DECIMALS = /^\d*\.?\d{0,2}$/;
+
 export default function Home() {
   const [serviceDate, setServiceDate] = useState("");
   const [service, setService] = useState(SERVICES[0]);
@@ -68,13 +70,14 @@ export default function Home() {
           </label>
           <input
             id="hours"
-            type="number"
+            type="text"
             inputMode="decimal"
-            min="0"
-            step="any"
+            pattern="\d*\.?\d{1,2}"
             required
             value={hours}
-            onChange={(e) => setHours(e.target.value)}
+            onChange={(e) => {
+              if (TWO_DECIMALS.test(e.target.value)) setHours(e.target.value);
+            }}
             className={`w-[68px] ${inputClass}`}
           />
         </div>
@@ -85,13 +88,14 @@ export default function Home() {
           </label>
           <input
             id="totalCost"
-            type="number"
+            type="text"
             inputMode="decimal"
-            min="0"
-            step="any"
+            pattern="\d*\.?\d{1,2}"
             required
             value={totalCost}
-            onChange={(e) => setTotalCost(e.target.value)}
+            onChange={(e) => {
+              if (TWO_DECIMALS.test(e.target.value)) setTotalCost(e.target.value);
+            }}
             className={`w-[68px] ${inputClass}`}
           />
         </div>
