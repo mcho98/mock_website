@@ -8,9 +8,48 @@ const labelClass = "w-48 pr-4 text-right text-[13px] font-bold text-[#3a8fc7]";
 const inputClass =
   "border border-[#7f9db9] bg-[#dfe9f1] px-1 py-0.5 text-right text-sm text-black";
 
+const buttonClass =
+  "rounded-sm border border-[#1b5e9e] bg-gradient-to-b from-[#3d9be0] to-[#0a6fc2] px-3 py-0.5 text-[13px] font-bold text-white disabled:cursor-not-allowed disabled:opacity-50";
+
 const TWO_DECIMALS = /^\d*\.?\d{0,2}$/;
 
+type Claim = {
+  id: number;
+  serviceDate: string;
+  service: string;
+  hours: string;
+  totalCost: string;
+};
+
+function ClaimsTable({ claims }: { claims: Claim[] }) {
+  return (
+    <table className="border-collapse text-sm">
+      <thead>
+        <tr className="bg-[#dfe9f1] text-left text-[13px] text-[#3a8fc7]">
+          <th className="border border-[#7f9db9] px-3 py-1">Service date</th>
+          <th className="border border-[#7f9db9] px-3 py-1">Service</th>
+          <th className="border border-[#7f9db9] px-3 py-1 text-right">Hours</th>
+          <th className="border border-[#7f9db9] px-3 py-1 text-right">Total cost ($)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {claims.map((c) => (
+          <tr key={c.id}>
+            <td className="border border-[#7f9db9] px-3 py-1">{c.serviceDate}</td>
+            <td className="border border-[#7f9db9] px-3 py-1">{c.service}</td>
+            <td className="border border-[#7f9db9] px-3 py-1 text-right">{c.hours}</td>
+            <td className="border border-[#7f9db9] px-3 py-1 text-right">{c.totalCost}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
 export default function Home() {
+  const [claims, setClaims] = useState<Claim[]>([]);
+  const [showPopup, setShowPopup] = useState(false);
+  const [predetermined, setPredetermined] = useState(false);
   const [serviceDate, setServiceDate] = useState("");
   const [service, setService] = useState(SERVICES[0]);
   const [hours, setHours] = useState("");
@@ -18,7 +57,11 @@ export default function Home() {
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    console.log({ serviceDate, service, hours, totalCost });
+    if (predetermined) return;
+    setClaims((prev) => [
+      ...prev,
+      { id: prev.length + 1, serviceDate, service, hours, totalCost },
+    ]);
   }
 
   return (
@@ -89,27 +132,61 @@ export default function Home() {
           <input
             id="totalCost"
             type="text"
-            inputMode="decimal"
-            pattern="\d*\.?\d{1,2}"
             required
             value={totalCost}
-            onChange={(e) => {
-              if (TWO_DECIMALS.test(e.target.value)) setTotalCost(e.target.value);
-            }}
+            onChange={(e) => setTotalCost(e.target.value)}
             className={`w-[68px] ${inputClass}`}
           />
         </div>
 
         <div className="mt-8 flex">
           <div className="w-48 pr-4" />
-          <button
-            type="submit"
-            className="rounded-sm border border-[#1b5e9e] bg-gradient-to-b from-[#3d9be0] to-[#0a6fc2] px-3 py-0.5 text-[13px] font-bold text-white"
-          >
+          <button type="submit" disabled={predetermined} className={buttonClass}>
             Add claim
           </button>
         </div>
+
+        <div className="flex">
+          <div className="w-48 pr-4" />
+          <button
+            type="button"
+            onClick={() => {
+              setPredetermined(true);
+              setShowPopup(true);
+            }}
+            className={buttonClass}
+          >
+            Predetermine Claim
+          </button>
+        </div>
       </form>
+
+      {claims.length > 0 && <ClaimsTable claims={claims} />}
+
+      {showPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Added claims"
+            className="max-h-[80vh] overflow-auto bg-white p-6 shadow-lg"
+          >
+            <h2 className="mb-4 text-[15px] font-bold text-[#5a6b7b]">Added claims</h2>
+            {claims.length > 0 ? (
+              <ClaimsTable claims={claims} />
+            ) : (
+              <p className="text-sm">No claims added.</p>
+            )}
+            <button
+              type="button"
+              onClick={() => setShowPopup(false)}
+              className={`mt-6 ${buttonClass}`}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
