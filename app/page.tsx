@@ -21,28 +21,42 @@ type Claim = {
   totalCost: string;
 };
 
+// Sum in whole cents to avoid floating-point drift; non-numeric entries count as 0.
+function sumCents(values: string[]) {
+  return values.reduce((sum, v) => sum + (Math.round(parseFloat(v) * 100) || 0), 0);
+}
+
 function ClaimsTable({ claims }: { claims: Claim[] }) {
+  const totalHours = (sumCents(claims.map((c) => c.hours)) / 100).toFixed(2);
+  const totalCost = (sumCents(claims.map((c) => c.totalCost)) / 100).toFixed(2);
+
   return (
-    <table className="border-collapse text-sm">
-      <thead>
-        <tr className="bg-[#dfe9f1] text-left text-[13px] text-[#3a8fc7]">
-          <th className="border border-[#7f9db9] px-3 py-1">Service date</th>
-          <th className="border border-[#7f9db9] px-3 py-1">Service</th>
-          <th className="border border-[#7f9db9] px-3 py-1 text-right">Hours</th>
-          <th className="border border-[#7f9db9] px-3 py-1 text-right">Total cost ($)</th>
-        </tr>
-      </thead>
-      <tbody>
-        {claims.map((c) => (
-          <tr key={c.id}>
-            <td className="border border-[#7f9db9] px-3 py-1">{c.serviceDate}</td>
-            <td className="border border-[#7f9db9] px-3 py-1">{c.service}</td>
-            <td className="border border-[#7f9db9] px-3 py-1 text-right">{c.hours}</td>
-            <td className="border border-[#7f9db9] px-3 py-1 text-right">{c.totalCost}</td>
+    <div>
+      <table className="border-collapse text-sm">
+        <thead>
+          <tr className="bg-[#dfe9f1] text-left text-[13px] text-[#3a8fc7]">
+            <th className="border border-[#7f9db9] px-3 py-1">Service date</th>
+            <th className="border border-[#7f9db9] px-3 py-1">Service</th>
+            <th className="border border-[#7f9db9] px-3 py-1 text-right">Hours</th>
+            <th className="border border-[#7f9db9] px-3 py-1 text-right">Total cost ($)</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {claims.map((c) => (
+            <tr key={c.id}>
+              <td className="border border-[#7f9db9] px-3 py-1">{c.serviceDate}</td>
+              <td className="border border-[#7f9db9] px-3 py-1">{c.service}</td>
+              <td className="border border-[#7f9db9] px-3 py-1 text-right">{c.hours}</td>
+              <td className="border border-[#7f9db9] px-3 py-1 text-right">{c.totalCost}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="mt-3 text-sm font-bold text-[#5a6b7b]">
+        <div>Total hours: {totalHours}</div>
+        <div>Total cost: ${totalCost}</div>
+      </div>
+    </div>
   );
 }
 
