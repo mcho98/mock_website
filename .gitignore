@@ -42,3 +42,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# saved copies of the real site (contain real patient data)
+base_website.html
+elements.html
